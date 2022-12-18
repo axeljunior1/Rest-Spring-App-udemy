@@ -4,9 +4,10 @@ import com.in28minutes.rest.webservices.restfulwebservices.Beans.User;
 import com.in28minutes.rest.webservices.restfulwebservices.User.UserNotFoundException;
 import com.in28minutes.rest.webservices.restfulwebservices.repository.UserRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -15,21 +16,26 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MessageSource messageSource;
+    private final UserRepository userRepository;
+    private final MessageSource messageSource;
 
+    public UserController(UserRepository userRepository, MessageSource messageSource) {
+        this.userRepository = userRepository;
+        this.messageSource = messageSource;
+    }
 
     @GetMapping("/users")
     Iterable<User> getAll(){
         return userRepository.findAll();
     }
 
-    @GetMapping("/hellointer")
-    String gethelloInter(){
+    @GetMapping("/hello-inter")
+    String getHelloInter(){
         Locale locale = LocaleContextHolder.getLocale();
         return messageSource.getMessage("good.morning.message", null, "Default Message", locale);
 
@@ -38,12 +44,13 @@ public class UserController {
 
 
     @GetMapping("/users/{id}")
-    Optional<User> getUserById(@PathVariable("id") Long id){
+    EntityModel<Optional<User>> getUserById(@PathVariable("id") Long id){
         Optional<User> user = userRepository.findById(id);
-        if (!user.isPresent()){
-            throw new UserNotFoundException("id: "+ id);
-        }
-        return user;
+        if (user.isEmpty())throw new UserNotFoundException("id: "+ id);
+        EntityModel<Optional<User>> entityModel =   EntityModel.of(user);
+        WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).getAll());
+        entityModel.add(link.withRel("all-users"));
+        return entityModel;
     }
 
     @PostMapping("/users")
@@ -61,4 +68,9 @@ public class UserController {
             userRepository.deleteById(id);
         }
     }
+
+//WebMvcLinkBuilder
+//    EntityModel
+
+
 }
