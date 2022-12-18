@@ -1,15 +1,15 @@
 package com.in28minutes.rest.webservices.restfulwebservices.filtering;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Getter;
 
 @Getter
+
 //@JsonIgnoreProperties("f3")
+@JsonFilter("SomeBeanFilter")
 public class SomeBean {
     private final String f1;
-    @JsonIgnore //prefer
+//    @JsonIgnore //prefer
     private final String f2;
     private final String f3;
 
