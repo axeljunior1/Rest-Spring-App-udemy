@@ -20,7 +20,6 @@ public class User {
     private Long id;
 
     @Size(min = 2, message = "too short name")
-    @JsonProperty("user_name")
     private String name;
 
     @Past(message = "Your date is in the future")
