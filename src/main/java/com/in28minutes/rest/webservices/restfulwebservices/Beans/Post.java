@@ -1,5 +1,6 @@
 package com.in28minutes.rest.webservices.restfulwebservices.Beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,16 +8,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "post")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
     private String description;
-
-
 
 
 }
